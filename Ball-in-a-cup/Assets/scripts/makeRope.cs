@@ -3,8 +3,8 @@ using System.Collections;
 
 public class makeRope : MonoBehaviour {
 
-	static int NUMBER_OF_LINKS     = 250;
-	static float LENGTH_MASS_RATIO = 0.1f;
+	static int NUMBER_OF_LINKS     = 600;
+	static float LENGTH_MASS_RATIO = 0.001f;
 	static int BALL_TO_LINK_RATIO  = 20;
 	static float BASE_Y_SCALE      = 0.001f;
 	float LINK_LENGTH              = 0.005f;
@@ -24,7 +24,7 @@ public class makeRope : MonoBehaviour {
 
 		rope_base.transform.localScale = new Vector3 (1, BASE_Y_SCALE, 1); //BASE_Y_SCALE,1);
 		//rope_base.GetComponent<BoxCollider> ().size = new Vector3 (1, 1, 1); //BASE_Y_SCALE, 1);
-		//rope_base.transform.Rotate (new Vector3 (45, 0, 190), 0.01f * Time.deltaTime);
+
 		Rigidbody base_rbody = rope_base.AddComponent<Rigidbody>();
 		
 		rope_base.transform.position = new Vector3(0,1,-9); // Change this when working!
