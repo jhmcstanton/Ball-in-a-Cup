@@ -12,14 +12,15 @@ public class makeRope : MonoBehaviour {
 
 
 	GameObject[] rope_links        = new GameObject[NUMBER_OF_LINKS];
-
+	private GameObject ball;
 
 
 	// Use this for initialization
 	void Start () {
 		GameObject rope_prefab       = Resources.Load<GameObject>("Rope_Segment");
 		GameObject rope_base         = GameObject.CreatePrimitive (PrimitiveType.Cube);
-		GameObject ball              = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		ball              = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		ball.name					 = "Ball";
 		ConfigurableJoint dl_joint;
 		var JOINT_SEPARATION         = LINK_LENGTH;//new Vector3 (LINK_LENGTH, LINK_LENGTH, LINK_LENGTH);
 	    
@@ -91,6 +92,22 @@ public class makeRope : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (Input.GetKeyDown(KeyCode.RightArrow))	{
+			ball.rigidbody.AddForce(1000, 0, 0);
+			print("Right");
+		}
+		if (Input.GetKeyDown(KeyCode.LeftArrow))	{
+			ball.rigidbody.AddForce(-1000, 0, 0);
+			print ("Left");
+		}
+		if (Input.GetKeyDown(KeyCode.UpArrow))	{
+			ball.rigidbody.AddForce(0, 0, 1000);
+			print ("Up");
+		}
+		if (Input.GetKeyDown(KeyCode.DownArrow))	{
+			ball.rigidbody.AddForce(0, 0, -1000);
+			print ("Down");
+		}
 	}
 
 	void make_joint(GameObject base_object, Rigidbody connected){
