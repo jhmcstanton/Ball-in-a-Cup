@@ -4,11 +4,12 @@ using System.Collections;
 
 public class makeRope : MonoBehaviour {
 
-	static int NUMBER_OF_LINKS     = 500;
+	static int NUMBER_OF_LINKS     = 400;
 	static float LENGTH_MASS_RATIO = 0.001f;
-	static int BALL_TO_LINK_RATIO  = 20;
+	static int BALL_TO_LINK_RATIO  = 100;
 	static float BASE_Y_SCALE      = 0.001f;
 	static float LINK_LENGTH       = 0.005f;
+	static float INPUT_FORCE       = 50;
 
 
 	GameObject[] rope_links        = new GameObject[NUMBER_OF_LINKS];
@@ -46,7 +47,7 @@ public class makeRope : MonoBehaviour {
 		                                           , BALL_TO_LINK_RATIO * LINK_LENGTH );
 		ball.transform.parent        = rope_base.transform;
 		ball.transform.localPosition = new Vector3 ( 0
-		                                           , (2 * (NUMBER_OF_LINKS + 2) * LINK_LENGTH + 0.5f * BASE_Y_SCALE) / BASE_Y_SCALE
+		                                           , ((2 * (NUMBER_OF_LINKS + 1) + (BALL_TO_LINK_RATIO / 2)) * LINK_LENGTH + 0.5f * BASE_Y_SCALE) / BASE_Y_SCALE
 		                                           , 0
 		                                           );
 
@@ -92,21 +93,45 @@ public class makeRope : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.RightArrow))	{
-			ball.rigidbody.AddForce(1000, 0, 0);
-			print("Right");
+		/*if (Input.GetKey (KeyCode.RightArrow)) {
+				ball.rigidbody.AddForce (INPUT_FORCE, 0, 0);
+				print ("Right");
+			} else if (Input.GetKey (KeyCode.LeftArrow)) {
+				ball.rigidbody.AddForce (-INPUT_FORCE, 0, 0);
+				print ("Left");
+			} else if (Input.GetKey (KeyCode.UpArrow)) {
+				ball.rigidbody.AddForce (0, 0, INPUT_FORCE);
+				print ("Forwards");
+			} else if (Input.GetKey (KeyCode.DownArrow)) {
+				ball.rigidbody.AddForce (0, 0, -INPUT_FORCE);
+				print ("Backwards");
+			} else if (Input.GetKey (KeyCode.W)) {
+				ball.rigidbody.AddForce (0, INPUT_FORCE * 1.5f, 0);
+				print ("Up");
+			} else if (Input.GetKey (KeyCode.S)) {
+				ball.rigidbody.AddForce (0, -INPUT_FORCE / 2, 0);
+			print("Down");
+			} */
+		add_input_force (ball, NUMBER_OF_LINKS + 1);
+		for(var i = 0; i < NUMBER_OF_LINKS; i++) {
+			add_input_force(rope_links[i], i);
 		}
-		if (Input.GetKeyDown(KeyCode.LeftArrow))	{
-			ball.rigidbody.AddForce(-1000, 0, 0);
-			print ("Left");
-		}
-		if (Input.GetKeyDown(KeyCode.UpArrow))	{
-			ball.rigidbody.AddForce(0, 0, 1000);
-			print ("Up");
-		}
-		if (Input.GetKeyDown(KeyCode.DownArrow))	{
-			ball.rigidbody.AddForce(0, 0, -1000);
-			print ("Down");
+	}
+
+	void add_input_force(GameObject element, int index){
+		float scale = index * 1.5f / NUMBER_OF_LINKS; 
+		if (Input.GetKey (KeyCode.RightArrow)) {
+			element.rigidbody.AddForce (INPUT_FORCE + scale, 0, 0);
+		} else if (Input.GetKey (KeyCode.LeftArrow)) {
+			element.rigidbody.AddForce (-INPUT_FORCE - scale, 0, 0);
+		} else if (Input.GetKey (KeyCode.UpArrow)) {
+			element.rigidbody.AddForce (0, 0, INPUT_FORCE + scale);
+		} else if (Input.GetKey (KeyCode.DownArrow)) {
+			element.rigidbody.AddForce (0, 0, -INPUT_FORCE - scale);
+		} else if (Input.GetKey (KeyCode.W)) {
+			element.rigidbody.AddForce (0, INPUT_FORCE + scale, 0);
+		} else if (Input.GetKey (KeyCode.S)) {
+			element.rigidbody.AddForce (0, -INPUT_FORCE - scale, 0);
 		}
 	}
 
