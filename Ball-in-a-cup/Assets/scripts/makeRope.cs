@@ -4,39 +4,37 @@ using System.Collections;
 
 public class makeRope : MonoBehaviour {
 
-	static int NUMBER_OF_LINKS     = 400;
+	static int NUMBER_OF_LINKS     = 500;
 	static float LENGTH_MASS_RATIO = 0.001f;
 	static int BALL_TO_LINK_RATIO  = 100;
 	static float BASE_Y_SCALE      = 0.001f;
 	static float LINK_LENGTH       = 0.005f;
-	static float INPUT_FORCE       = 50;
+	static float INPUT_FORCE       = 9.8f;
 
 
 	GameObject[] rope_links        = new GameObject[NUMBER_OF_LINKS];
 	private GameObject ball;
-
+	private bool game_running;
 
 	// Use this for initialization
 	void Start () {
 		GameObject rope_prefab       = Resources.Load<GameObject>("Rope_Segment");
 		GameObject rope_base         = GameObject.CreatePrimitive (PrimitiveType.Cube);
-		ball              = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		ball             			 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 		ball.name					 = "Ball";
-		ConfigurableJoint dl_joint;
-		var JOINT_SEPARATION         = LINK_LENGTH;//new Vector3 (LINK_LENGTH, LINK_LENGTH, LINK_LENGTH);
-	    
+		game_running 				 = true;
+		var JOINT_SEPARATION         = LINK_LENGTH;
 
-		rope_base.transform.localScale = new Vector3 (1, BASE_Y_SCALE, 1); //BASE_Y_SCALE,1);
-		//rope_base.GetComponent<BoxCollider> ().size = new Vector3 (1, 1, 1); //BASE_Y_SCALE, 1);
+		rope_base.transform.localScale = new Vector3 (1, BASE_Y_SCALE, 1); 
+
 		
 		Rigidbody base_rbody = rope_base.AddComponent<Rigidbody>();
 		
-		rope_base.transform.position = new Vector3(0, -1.25f, 0); // Change this when working!
+		rope_base.transform.position = new Vector3(0, -1.25f, 0); 
 		rope_base.GetComponent<BoxCollider> ().size = new Vector3 (0, 0.001f, 0);
-		//base_rbody.freezeRotation    = true;
+
 		base_rbody.constraints       = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
-		//rope_base.GetComponent<BoxCollider> ().enabled = false;                              
-		//rope_base.GetComponent<MeshRenderer> ().enabled = false;		                     
+
 
 
 
@@ -54,7 +52,7 @@ public class makeRope : MonoBehaviour {
 
 
 		var ball_rigid_body          = ball.AddComponent<Rigidbody> ();
-		ball_rigid_body.mass         = LENGTH_MASS_RATIO * NUMBER_OF_LINKS * 0.5f * BASE_Y_SCALE;
+		ball_rigid_body.mass         = LENGTH_MASS_RATIO * NUMBER_OF_LINKS * 2; // * 0.5f * BASE_Y_SCALE;
 		ball_rigid_body.useGravity   = true;
 
 
@@ -93,47 +91,38 @@ public class makeRope : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		/*if (Input.GetKey (KeyCode.RightArrow)) {
-				ball.rigidbody.AddForce (INPUT_FORCE, 0, 0);
-				print ("Right");
+		float xLoc = ball.transform.position.x;
+		float yLoc = ball.transform.position.y;
+		float zLoc = ball.transform.position.z;
+				
+		if ((xLoc < 0.5f && xLoc > -0.5f) && (yLoc > 0.4f && yLoc < 1f) && (zLoc < 0.5f && zLoc > -0.5f)){
+			game_running = false;
+
+			print("In the cup!");
+			ball.rigidbody.constraints   = RigidbodyConstraints.FreezeAll;
+			foreach(var dl in rope_links){
+				dl.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+			}
+		}
+		else if (game_running){
+			if (Input.GetKey (KeyCode.RightArrow)) {
+				Physics.gravity = new Vector3 (INPUT_FORCE, 0, 0);
 			} else if (Input.GetKey (KeyCode.LeftArrow)) {
-				ball.rigidbody.AddForce (-INPUT_FORCE, 0, 0);
-				print ("Left");
+				Physics.gravity = new Vector3 (-INPUT_FORCE, 0, 0);
 			} else if (Input.GetKey (KeyCode.UpArrow)) {
-				ball.rigidbody.AddForce (0, 0, INPUT_FORCE);
-				print ("Forwards");
+				Physics.gravity = new Vector3 (0, 0, INPUT_FORCE);
 			} else if (Input.GetKey (KeyCode.DownArrow)) {
-				ball.rigidbody.AddForce (0, 0, -INPUT_FORCE);
-				print ("Backwards");
+				Physics.gravity = new Vector3 (0, 0, -INPUT_FORCE);
 			} else if (Input.GetKey (KeyCode.W)) {
-				ball.rigidbody.AddForce (0, INPUT_FORCE * 1.5f, 0);
-				print ("Up");
+				Physics.gravity = new Vector3 (0, INPUT_FORCE, 0);
 			} else if (Input.GetKey (KeyCode.S)) {
-				ball.rigidbody.AddForce (0, -INPUT_FORCE / 2, 0);
-			print("Down");
-			} */
-		add_input_force (ball, NUMBER_OF_LINKS + 1);
-		for(var i = 0; i < NUMBER_OF_LINKS; i++) {
-			add_input_force(rope_links[i], i);
+				Physics.gravity = new Vector3 (0, -INPUT_FORCE, 0);
+			} else {
+				Physics.gravity = new Vector3(0, -9.8f, 0);		
+			}
 		}
 	}
 
-	void add_input_force(GameObject element, int index){
-		float scale = index * 1.5f / NUMBER_OF_LINKS; 
-		if (Input.GetKey (KeyCode.RightArrow)) {
-			element.rigidbody.AddForce (INPUT_FORCE + scale, 0, 0);
-		} else if (Input.GetKey (KeyCode.LeftArrow)) {
-			element.rigidbody.AddForce (-INPUT_FORCE - scale, 0, 0);
-		} else if (Input.GetKey (KeyCode.UpArrow)) {
-			element.rigidbody.AddForce (0, 0, INPUT_FORCE + scale);
-		} else if (Input.GetKey (KeyCode.DownArrow)) {
-			element.rigidbody.AddForce (0, 0, -INPUT_FORCE - scale);
-		} else if (Input.GetKey (KeyCode.W)) {
-			element.rigidbody.AddForce (0, INPUT_FORCE + scale, 0);
-		} else if (Input.GetKey (KeyCode.S)) {
-			element.rigidbody.AddForce (0, -INPUT_FORCE - scale, 0);
-		}
-	}
 
 	void make_joint(GameObject base_object, Rigidbody connected){
 		var joint                = base_object.AddComponent<ConfigurableJoint>();
