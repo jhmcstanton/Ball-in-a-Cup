@@ -15,12 +15,14 @@ public class makeRope : MonoBehaviour {
 	GameObject[] rope_links        = new GameObject[NUMBER_OF_LINKS];
 	private GameObject ball;
 	private GameObject rope_base;
-	private bool game_running;
+	private bool       game_running;
+	private int        score;
 
 
 	// Use this for initialization
 	void Start () {
 		build_rope ();
+		score = 0;
 	}
 
 	// builds the rope and base, used in initialization of game and during a reset
@@ -104,7 +106,8 @@ public class makeRope : MonoBehaviour {
 		float yLoc = ball.transform.position.y;
 		float zLoc = ball.transform.position.z;
 				
-		if ((xLoc < 0.5f && xLoc > -0.5f) && (yLoc > 0.4f && yLoc < 1f) && (zLoc < 0.5f && zLoc > -0.5f)){
+		if ((xLoc < 0.5f && xLoc > -0.5f) && (yLoc > 0.4f && yLoc < 1f) && (zLoc < 0.5f && zLoc > -0.5f) && game_running){
+			score++;
 			game_running = false;
 
 			print("In the cup!");
@@ -162,7 +165,9 @@ public class makeRope : MonoBehaviour {
 	// used every frame to check for gui events
 	void OnGUI(){
 
-		if (GUI.Button (new Rect (10, 10, 100, 100), "Reset Ball")) {
+
+		GUI.TextArea (new Rect (Screen.width * 0.8f , 10, Screen.width / 10, Screen.height / 10), "\nScore:  " + score);
+		if (GUI.Button (new Rect (10, 10, Screen.width / 10, Screen.height / 10), "Reset Ball")) {
 			print("Reset hit!");
 			destroy_rope();
 			build_rope();
