@@ -1,15 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 
 public class makeRope : MonoBehaviour {
 
-	static int NUMBER_OF_LINKS     = 500;
-	static float LENGTH_MASS_RATIO = 0.001f;
+	static int NUMBER_OF_LINKS     = 300;
+	static float LENGTH_MASS_RATIO = 0.0007f;
 	static int BALL_TO_LINK_RATIO  = 100;
 	static float BASE_Y_SCALE      = 0.001f;
 	static float LINK_LENGTH       = 0.005f;
-	static float INPUT_FORCE       = 5.8f;
+	static float INPUT_FORCE       = 50.8f;
 
 
 	GameObject[] rope_links        = new GameObject[NUMBER_OF_LINKS];
@@ -61,7 +61,7 @@ public class makeRope : MonoBehaviour {
 		
 		
 		var ball_rigid_body          = ball.AddComponent<Rigidbody> ();
-		ball_rigid_body.mass         = LENGTH_MASS_RATIO * NUMBER_OF_LINKS * 2; // * 0.5f * BASE_Y_SCALE;
+		ball_rigid_body.mass         = LENGTH_MASS_RATIO * NUMBER_OF_LINKS * 5.2f; // * 0.5f * BASE_Y_SCALE; // was 2
 		ball_rigid_body.useGravity   = true;
 		
 		
@@ -99,8 +99,8 @@ public class makeRope : MonoBehaviour {
 
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	// Update is called once per frame // fixedUpdate is better since frame timing depends on graphics processor
+	void FixedUpdate () {
 
 		float xLoc = ball.transform.position.x;
 		float yLoc = ball.transform.position.y;
@@ -117,21 +117,22 @@ public class makeRope : MonoBehaviour {
 			}
 		}
 		else if (game_running){
-			if (Input.GetKey (KeyCode.RightArrow)) {
-				Physics.gravity = new Vector3 (INPUT_FORCE, 0, 0);
-			} else if (Input.GetKey (KeyCode.LeftArrow)) {
-				Physics.gravity = new Vector3 (-INPUT_FORCE, 0, 0);
-			} else if (Input.GetKey (KeyCode.UpArrow)) {
-				Physics.gravity = new Vector3 (0, 0, INPUT_FORCE);
-			} else if (Input.GetKey (KeyCode.DownArrow)) {
-				Physics.gravity = new Vector3 (0, 0, -INPUT_FORCE);
-			} else if (Input.GetKey (KeyCode.W)) {
-				Physics.gravity = new Vector3 (0, INPUT_FORCE, 0);
-			} else if (Input.GetKey (KeyCode.S)) {
-				Physics.gravity = new Vector3 (0, -INPUT_FORCE, 0);
-			} else {
+			//if (Input.GetKey (KeyCode.RightArrow)) {
+				ball.rigidbody.AddForce(Input.acceleration.x*60,0,0,ForceMode.Acceleration);
+			//} else if (Input.GetKey (KeyCode.LeftArrow)) {
+				ball.rigidbody.AddForce(-Input.acceleration.x*60,0,0,ForceMode.Acceleration); //Physics.gravity = new Vector3 (-INPUT_FORCE, 0, 0);
+			//} else if (Input.GetKey (KeyCode.UpArrow)) {
+				ball.rigidbody.AddForce(0,0,Input.acceleration.z*60,ForceMode.Acceleration);//Physics.gravity = new Vector3 (0, 0, INPUT_FORCE);
+			//} else if (Input.GetKey (KeyCode.DownArrow)) {
+				ball.rigidbody.AddForce(0,0,-Input.acceleration.z*60,ForceMode.Acceleration); //Physics.gravity = new Vector3 (0, 0, -INPUT_FORCE);
+			//} else if (Input.GetKey (KeyCode.W)) {
+				ball.rigidbody.AddForce(0,Input.acceleration.y*60,0,ForceMode.Acceleration); //Physics.gravity = new Vector3 (0, INPUT_FORCE, 0);
+			//} else if (Input.GetKey (KeyCode.S)) {
+				ball.rigidbody.AddForce(0,-Input.acceleration.y*60,0,ForceMode.Acceleration); //Physics.gravity = new Vector3 (0, -INPUT_FORCE, 0);
+
+			//} else {
 				Physics.gravity = new Vector3(0, -9.8f, 0);		
-			}
+			//}
 		}
 	}
 
@@ -143,6 +144,8 @@ public class makeRope : MonoBehaviour {
 		joint_lim.bounciness     = 0.001f;
 		joint_lim.spring         = 0.001f;
 		joint_lim.damper         = 100000;
+		//joint.projectionMode = 
+		//joint.projectionDistance = 0.01f;
 		joint.linearLimit        = joint_lim;
 
 		joint.xMotion            = ConfigurableJointMotion.Locked;
@@ -166,7 +169,7 @@ public class makeRope : MonoBehaviour {
 	void OnGUI(){
 
 
-		GUI.TextArea (new Rect (Screen.width * 0.8f , 10, Screen.width / 10, Screen.height / 10), "\nScore:  " + score);
+		GUI.TextArea (new Rect (Screen.width * 0.8f , 10, Screen.width / 10, Screen.height / 10), "\nScore:  " + Input.acceleration.x*6000);
 		if (GUI.Button (new Rect (10, 10, Screen.width / 10, Screen.height / 10), "Reset Ball")) {
 			print("Reset hit!");
 			destroy_rope();
